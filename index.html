@@ -106,6 +106,96 @@
         input[type="text"] { width: 100%; padding: 12px; border: 2px solid var(--border);
                             border-radius: 8px; font-size: 1.1rem; font-family: 'Karla', sans-serif; }
         input[type="text"]:focus { outline: none; border-color: var(--accent-primary); }
+    
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border: none;
+        }
+        
+        .help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .help-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .help-modal.active {
+            display: flex;
+        }
+        
+        .help-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .close-help {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .help-content h2 {
+            font-family: 'DM Serif Display', serif;
+            color: var(--accent-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .help-content h3 {
+            color: var(--accent-primary);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .help-content ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .help-content p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
     </style>
 </head>
 <body>
@@ -149,6 +239,80 @@
         </div>
 
         <div id="gameArea" class="game-area" style="display: none;"></div>
+    
+    <!-- Help Button -->
+    <button class="help-btn" onclick="toggleHelp()" title="Help & Instructions">❓</button>
+    
+    <!-- Help Modal -->
+    <div id="helpModal" class="help-modal" onclick="if(event.target === this) toggleHelp()">
+        <div class="help-content">
+            <button class="close-help" onclick="toggleHelp()">✕</button>
+            <h2>📚 How to Use the Italian Learning Game</h2>
+            
+            <h3>🔢 Learn Your Numbers</h3>
+            <ul>
+                <li>See an Italian number word</li>
+                <li>Choose the correct number from 4 options</li>
+                <li>Practice 10 random numbers each session</li>
+            </ul>
+            
+            <h3>🎯 Speech Shadow</h3>
+            <ul>
+                <li>See an Italian word or phrase</li>
+                <li>Type the English translation</li>
+                <li>Click "Show Answer" if you need help</li>
+                <li>Practices vocab, phrases, and idioms</li>
+            </ul>
+            
+            <h3>🌉 Word Bridge</h3>
+            <ul>
+                <li>See an English word or phrase</li>
+                <li>Choose the correct Italian translation</li>
+                <li>Multiple choice with 4 options</li>
+                <li>Instant feedback on each answer</li>
+            </ul>
+            
+            <h3>🚗 Driver's License Test</h3>
+            <ul>
+                <li>30 questions from official Italian exam</li>
+                <li>20-minute timer (turns red at 1 minute)</li>
+                <li>Answer VERO (true) or FALSO (false)</li>
+                <li>Pass with ≤3 errors</li>
+                <li>Review wrong answers at the end</li>
+            </ul>
+            
+            <h3>📖 Verb Master</h3>
+            <ul>
+                <li>See an Italian verb infinitive</li>
+                <li>Choose the correct English meaning</li>
+                <li>Practice 10 random verbs each session</li>
+                <li>From a database of 1,000 common verbs</li>
+            </ul>
+            
+            <h3>📱 Mobile Users</h3>
+            <p><strong>iPhone:</strong> Safari → Share → "Add to Home Screen"</p>
+            <p><strong>Android:</strong> Chrome → Menu (⋮) → "Add to home screen"</p>
+            
+            <h3>🔄 Updating Content</h3>
+            <p>To add more questions, words, or verbs:</p>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Edit <strong>Italian_Phrases_and_Vocab-for_game_April_2026.xlsx</strong></li>
+                <li>Upload to GitHub</li>
+                <li>Refresh the game - new content appears automatically!</li>
+            </ol>
+            
+            <h3>📊 Current Content</h3>
+            <p id="helpStats">Loading statistics...</p>
+            
+            <div style="margin-top: 30px; padding: 20px; background: var(--bg-primary); border-radius: 8px;">
+                <p style="margin: 0; text-align: center; color: var(--text-secondary);">
+                    <strong>Questions or issues?</strong><br>
+                    Visit: <a href="https://github.com/josephvaleri/italian-learning-game" style="color: var(--accent-primary);">GitHub Repository</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
     </div>
 
     <script>
@@ -729,6 +893,24 @@
             }
             setTimeout(() => { currentIndex++; showVerbQuestion(); }, 1500);
         }
+
+        function toggleHelp() {
+            const modal = document.getElementById('helpModal');
+            modal.classList.toggle('active');
+            
+            // Update stats when opening
+            if (modal.classList.contains('active')) {
+                document.getElementById('helpStats').innerHTML = `
+                    <strong>📚 Vocabulary:</strong> ${gameData.vocab.length} words<br>
+                    <strong>💬 Phrases:</strong> ${gameData.phrases.length} phrases<br>
+                    <strong>🎭 Idioms:</strong> ${gameData.idioms.length} idioms<br>
+                    <strong>🔢 Numbers:</strong> ${gameData.numbers.length} numbers<br>
+                    <strong>📖 Verbs:</strong> ${gameData.verbs.length} verbs<br>
+                    <strong>🚗 Quiz Questions:</strong> ${gameData.quiz.length} questions
+                `;
+            }
+        }
+
     </script>
 </body>
 </html>
