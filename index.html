@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2A5A4A">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -26,57 +26,59 @@
         header { text-align: center; margin-bottom: 40px; animation: fadeInDown 0.6s ease-out; }
         h1 { font-family: 'DM Serif Display', serif; font-size: 3rem; color: var(--accent-secondary); margin-bottom: 10px; }
         .subtitle { font-size: 1.1rem; color: var(--text-secondary); font-style: italic; }
-        
+
         #loadingScreen { text-align: center; padding: 100px 20px; }
         .loader { border: 5px solid var(--border); border-top: 5px solid var(--accent-primary);
                   border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        
+
         .error-message { background: #FFEBEE; border: 2px solid var(--error); border-radius: 12px; padding: 30px; margin-top: 30px; text-align: left; }
-        
+
         .mode-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                         gap: 20px; margin-bottom: 40px; animation: fadeIn 0.8s ease-out 0.2s backwards; }
         .mode-card { background: white; border: 3px solid var(--border); border-radius: 16px; padding: 30px;
                     cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .mode-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--accent-primary); }
+        .mode-card.medical-card { border-color: #2A7A6A; }
+        .mode-card.medical-card:hover { border-color: #1f5a4e; box-shadow: 0 8px 24px rgba(42,90,74,0.2); }
         .mode-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--accent-secondary); margin-bottom: 15px; }
         .mode-card p { color: var(--text-secondary); line-height: 1.6; }
-        
+
         .game-area { background: white; border: 3px solid var(--border); border-radius: 16px;
                     padding: 40px; min-height: 400px; animation: fadeIn 0.5s ease-out; }
-        
+
         button { background: var(--accent-secondary); color: white; border: none; padding: 12px 24px;
                 border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;
                 transition: all 0.3s ease; font-family: 'Karla', sans-serif; }
         button:hover { background: #1f4438; transform: translateY(-2px); }
         .back-btn { background: var(--text-secondary); margin-bottom: 20px; }
         .controls { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
-        
+
         .progress-bar { width: 100%; height: 8px; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent-primary); transition: width 0.3s ease; }
-        
+
         .choice-btn { background: white; color: var(--text-primary); border: 3px solid var(--border);
                      padding: 15px; margin: 5px; transition: all 0.2s; }
         .choice-btn:hover { border-color: var(--accent-secondary); }
-        
+
         .feedback { padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center; }
         .feedback.success { background: #E8F5E9; border: 2px solid var(--success); color: #2E7D32; }
         .feedback.error { background: #FFEBEE; border: 2px solid var(--error); color: #C62828; }
-        
+
         .stats { display: flex; justify-content: space-around; margin-top: 30px; padding-top: 30px; border-top: 2px solid var(--border); }
         .stat { text-align: center; }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent-primary); font-family: 'DM Serif Display', serif; }
         .stat-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
-        
+
         .timer { position: fixed; top: 20px; right: 20px; background: white; border: 3px solid var(--accent-secondary);
                 border-radius: 12px; padding: 15px 25px; font-size: 1.5rem; font-weight: 700;
                 font-family: 'DM Serif Display', serif; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1000; }
         .timer.warning { border-color: var(--error); color: var(--error); animation: pulse 1s infinite; }
-        
+
         .answer-btn { background: white; border: 3px solid var(--border); color: var(--text-primary);
                      padding: 15px 40px; border-radius: 12px; font-size: 1.2rem; font-weight: 700;
                      cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
@@ -87,17 +89,30 @@
         .answer-btn.falso:hover { background: var(--error); color: white; }
         .answer-btn.selected.vero { background: var(--success); border-color: var(--success); color: white; }
         .answer-btn.selected.falso { background: var(--error); border-color: var(--error); color: white; }
-        
+
         input[type="text"] { width: 100%; padding: 12px; border: 2px solid var(--border);
                             border-radius: 8px; font-size: 1.1rem; font-family: 'Karla', sans-serif; }
         input[type="text"]:focus { outline: none; border-color: var(--accent-primary); }
-        
+
+        /* Medical mode direction toggle */
+        .direction-toggle { display: flex; gap: 0; border: 2px solid var(--border); border-radius: 8px;
+                           overflow: hidden; margin: 0 auto 30px; max-width: 400px; }
+        .dir-btn { flex: 1; padding: 10px 16px; background: white; color: var(--text-secondary);
+                  border: none; border-radius: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+                  transition: all 0.2s; transform: none; }
+        .dir-btn:hover { background: var(--bg-secondary); transform: none; }
+        .dir-btn.active { background: var(--accent-secondary); color: white; }
+
+        .medical-badge { display: inline-block; background: #E8F5E9; color: #2E7D32;
+                        font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+                        margin-left: 8px; vertical-align: middle; }
+
         .help-btn { position: fixed; bottom: 20px; right: 20px; background: var(--accent-primary); color: white;
                    width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; display: flex;
                    align-items: center; justify-content: center; cursor: pointer;
                    box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 1000; border: none; }
         .help-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
-        
+
         .help-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
                      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
         .help-modal.active { display: flex; }
@@ -153,6 +168,10 @@
                     <h3>⏰ Verb Tenses</h3>
                     <p>Master Italian verb tenses! Practice presente, passato, imperfetto, futuro, and condizionale.</p>
                 </div>
+                <div class="mode-card medical-card" onclick="startMode('medical')">
+                    <h3>🏥 Learn Medical Terms <span class="medical-badge">NEW</span></h3>
+                    <p>Master Italian medical vocabulary. 300+ terms covering anatomy, conditions, treatments, and equipment.</p>
+                </div>
             </div>
         </div>
 
@@ -160,33 +179,33 @@
     </div>
 
     <button class="help-btn" onclick="toggleHelp()" title="Help & Instructions">❓</button>
-    
+
     <div id="helpModal" class="help-modal" onclick="if(event.target === this) toggleHelp()">
         <div class="help-content">
             <button class="close-help" onclick="toggleHelp()">✕</button>
             <h2>📚 How to Use the Italian Learning Game</h2>
-            
+
             <h3>🔢 Learn Your Numbers</h3>
             <ul>
                 <li>See an Italian number word</li>
                 <li>Choose the correct number from 4 options</li>
                 <li>Practice 10 random numbers each session</li>
             </ul>
-            
+
             <h3>🎯 Speech Shadow</h3>
             <ul>
                 <li>See an Italian word or phrase</li>
                 <li>Type the English translation</li>
                 <li>Click "Show Answer" if you need help</li>
             </ul>
-            
+
             <h3>🌉 Word Bridge</h3>
             <ul>
                 <li>See an English word or phrase</li>
                 <li>Choose the correct Italian translation</li>
                 <li>Multiple choice with instant feedback</li>
             </ul>
-            
+
             <h3>🚗 Driver's License Test</h3>
             <ul>
                 <li>30 questions from official Italian exam</li>
@@ -194,40 +213,48 @@
                 <li>Answer VERO (true) or FALSO (false)</li>
                 <li>Pass with ≤3 errors</li>
             </ul>
-            
+
             <h3>📖 Verb Master</h3>
             <ul>
                 <li>Phase 1: Match verb to English meaning</li>
                 <li>Phase 2: Type conjugations (io, tu, lui/lei, noi, voi, loro)</li>
                 <li>Practice 10 random verbs each session</li>
             </ul>
-            
+
             <h3>⏰ Verb Tenses</h3>
             <ul>
                 <li>See a verb conjugated in a specific tense</li>
                 <li>Identify which tense it is</li>
                 <li>Practice: Presente, Passato Prossimo, Imperfetto, Futuro, Condizionale</li>
             </ul>
-            
+
+            <h3>🏥 Learn Medical Terms</h3>
+            <ul>
+                <li>Choose your direction: Italian → English or English → Italian</li>
+                <li>See a medical term and pick the correct translation from 4 options</li>
+                <li>Covers 300+ terms: anatomy, conditions, treatments, and equipment</li>
+                <li>15 random terms per session</li>
+            </ul>
+
             <h3>📱 Mobile Users</h3>
             <p><strong>iPhone:</strong> Safari → Share → "Add to Home Screen"</p>
             <p><strong>Android:</strong> Chrome → Menu (⋮) → "Add to home screen"</p>
-            
+
             <h3>💻 Desktop Launcher</h3>
             <p><strong>Windows:</strong> <a href="https://github.com/josephvaleri/italian-learning-game/raw/main/Launch_Italian_Game.bat" style="color: var(--accent-primary);">Download .bat</a></p>
             <p><strong>Mac:</strong> <a href="https://github.com/josephvaleri/italian-learning-game/raw/main/Launch_Italian_Game.command" style="color: var(--accent-primary);">Download .command</a></p>
             <p><strong>Universal:</strong> <a href="https://github.com/josephvaleri/italian-learning-game/raw/main/Italian_Learning_Game.url" style="color: var(--accent-primary);">Download .url</a></p>
-            
+
             <h3>🔄 Updating Content</h3>
             <p>Edit the Excel file and upload to GitHub - changes appear automatically!</p>
-            
+
             <h3>📊 Current Content</h3>
             <p id="helpStats">Loading...</p>
         </div>
     </div>
 
     <script>
-        let gameData = { vocab: [], phrases: [], idioms: [], numbers: [], verbs: [], quiz: [], tenses: [] };
+        let gameData = { vocab: [], phrases: [], idioms: [], numbers: [], verbs: [], quiz: [], tenses: [], medical: [] };
         let currentMode = null, currentIndex = 0, sessionScore = { correct: 0, total: 0 };
 
         window.addEventListener('load', async () => {
@@ -242,11 +269,11 @@
                 if (!response.ok) throw new Error(`Could not find "${fileName}".`);
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                
+
                 parseVocabSheet(workbook); parsePhrasesSheet(workbook); parseIdiomsSheet(workbook);
                 parseNumbersSheet(workbook); parseVerbsSheet(workbook); parseQuizSheet(workbook);
-                parseTensesSheet(workbook);
-                
+                parseTensesSheet(workbook); parseMedicalSheet(workbook);
+
                 console.log('✓ Data loaded:', gameData);
             } catch (error) { console.error('Error:', error); throw error; }
         }
@@ -320,7 +347,6 @@
             const sheet = wb.Sheets['Verb Tenses'];
             if (!sheet) return;
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            // Row 2 has headers: Root Verb, Presente, Passato Prossimo, Imperfetto, Futuro Semplice, Condizionale, Present, Past Defined, Past Repeating, Future, Conditional
             for (let i = 2; i < data.length; i++) {
                 const row = data[i];
                 if (row[0]) {
@@ -333,6 +359,16 @@
                         condizionale: { italian: row[5], english: row[10] }
                     });
                 }
+            }
+        }
+
+        function parseMedicalSheet(wb) {
+            const sheet = wb.Sheets['Medical'];
+            if (!sheet) return;
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (row[0] && row[1]) gameData.medical.push({ italian: String(row[0]).trim(), english: String(row[1]).trim() });
             }
         }
 
@@ -355,13 +391,14 @@
             currentMode = mode; currentIndex = 0; sessionScore = { correct: 0, total: 0 };
             document.getElementById('modeSelection').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
-            
+
             if (mode === 'numbers') initNumbersMode();
             else if (mode === 'shadow') initSpeechShadow();
             else if (mode === 'bridge') initWordBridge();
             else if (mode === 'license') initLicenseTest();
             else if (mode === 'verbs') initVerbMode();
             else if (mode === 'tenses') initTensesMode();
+            else if (mode === 'medical') initMedicalMode();
         }
 
         function backToModes() {
@@ -390,12 +427,13 @@
                     <strong>🔢 Numbers:</strong> ${gameData.numbers.length} numbers<br>
                     <strong>📖 Verbs:</strong> ${gameData.verbs.length} verbs<br>
                     <strong>⏰ Verb Tenses:</strong> ${gameData.tenses.length} conjugations<br>
-                    <strong>🚗 Quiz:</strong> ${gameData.quiz.length} questions
+                    <strong>🚗 Quiz:</strong> ${gameData.quiz.length} questions<br>
+                    <strong>🏥 Medical Terms:</strong> ${gameData.medical.length} terms
                 `;
             }
         }
 
-        // NUMBERS MODE - Same as before
+        // ─── NUMBERS MODE ────────────────────────────────────────────────────────────
         let numbersQuestions = [];
         function initNumbersMode() {
             numbersQuestions = shuffle(gameData.numbers).slice(0, 10);
@@ -442,7 +480,7 @@
             }
         }
 
-        // SPEECH SHADOW - Same as before
+        // ─── SPEECH SHADOW ───────────────────────────────────────────────────────────
         let shadowQuestions = [];
         function initSpeechShadow() {
             const all = [...gameData.vocab, ...gameData.phrases, ...gameData.idioms];
@@ -500,7 +538,7 @@
             setTimeout(() => { currentIndex++; showShadowQuestion(); }, 2000);
         }
 
-        // WORD BRIDGE - Same as before
+        // ─── WORD BRIDGE ─────────────────────────────────────────────────────────────
         let bridgeQuestions = [];
         function initWordBridge() {
             bridgeQuestions = shuffle([...gameData.vocab, ...gameData.phrases]).slice(0, 10);
@@ -555,7 +593,7 @@
             setTimeout(() => { currentIndex++; showBridgeQuestion(); }, 1500);
         }
 
-        // LICENSE TEST - Same as before (keeping it concise for space)
+        // ─── LICENSE TEST ────────────────────────────────────────────────────────────
         let licenseQuestions = [], licenseAnswers = {}, licenseTimer = null, licenseTimeRemaining = 1200;
         function initLicenseTest() {
             licenseQuestions = shuffle(gameData.quiz).slice(0, 30);
@@ -644,7 +682,7 @@
             `;
         }
 
-        // VERB MASTER - NOW WITH CONJUGATION TESTING
+        // ─── VERB MASTER ─────────────────────────────────────────────────────────────
         let verbQuestions = [], verbPhase = 'meaning';
         function initVerbMode() {
             verbQuestions = shuffle(gameData.verbs.filter(v => v.io && v.tu && v.lui && v.noi && v.voi && v.loro)).slice(0, 10);
@@ -681,7 +719,6 @@
                     </div>
                 `;
             } else {
-                // Conjugation phase
                 document.getElementById('gameArea').innerHTML = `
                     <button class="back-btn" onclick="backToModes()">← Back</button>
                     <div class="progress-bar"><div class="progress-fill" style="width: ${((currentIndex + 1) / verbQuestions.length) * 100}%"></div></div>
@@ -742,35 +779,29 @@
             const noi = document.getElementById('noi-input').value.trim().toLowerCase();
             const voi = document.getElementById('voi-input').value.trim().toLowerCase();
             const loro = document.getElementById('loro-input').value.trim().toLowerCase();
-            
             sessionScore.total += 6;
             let correct = 0;
             const errors = [];
-            
             if (io === verb.io.toLowerCase()) correct++; else errors.push(`io: You wrote "${io || '(empty)'}", correct is "${verb.io}"`);
             if (tu === verb.tu.toLowerCase()) correct++; else errors.push(`tu: You wrote "${tu || '(empty)'}", correct is "${verb.tu}"`);
             if (lui === verb.lui.toLowerCase()) correct++; else errors.push(`lui/lei: You wrote "${lui || '(empty)'}", correct is "${verb.lui}"`);
             if (noi === verb.noi.toLowerCase()) correct++; else errors.push(`noi: You wrote "${noi || '(empty)'}", correct is "${verb.noi}"`);
             if (voi === verb.voi.toLowerCase()) correct++; else errors.push(`voi: You wrote "${voi || '(empty)'}", correct is "${verb.voi}"`);
             if (loro === verb.loro.toLowerCase()) correct++; else errors.push(`loro: You wrote "${loro || '(empty)'}", correct is "${verb.loro}"`);
-            
             sessionScore.correct += correct;
-            
             if (correct === 6) {
                 currentIndex++;
                 verbPhase = 'meaning';
                 showVerbQuestion();
             } else {
                 let feedbackHTML = '<div style="margin-top: 30px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;"><h3 style="color: var(--error);">Review:</h3>';
-                errors.forEach(err => {
-                    feedbackHTML += `<p>${err}</p>`;
-                });
+                errors.forEach(err => { feedbackHTML += `<p>${err}</p>`; });
                 feedbackHTML += '<button onclick="verbPhase=\'conjugation\'; showVerbQuestion();" style="margin-top: 20px; width: 100%;">Try Again</button></div>';
                 document.getElementById('gameArea').innerHTML += feedbackHTML;
             }
         }
 
-        // NEW: VERB TENSES MODE
+        // ─── VERB TENSES ─────────────────────────────────────────────────────────────
         let tensesQuestions = [];
         function initTensesMode() {
             tensesQuestions = shuffle(gameData.tenses).slice(0, 10);
@@ -791,20 +822,11 @@
                 `;
                 return;
             }
-            
             const tense = tensesQuestions[currentIndex];
             const tenseTypes = ['presente', 'passatoProssimo', 'imperfetto', 'futuro', 'condizionale'];
             const randomTense = tenseTypes[Math.floor(Math.random() * tenseTypes.length)];
             const tenseData = tense[randomTense];
-            const tenseNames = {
-                presente: 'Presente',
-                passatoProssimo: 'Passato Prossimo',
-                imperfetto: 'Imperfetto',
-                futuro: 'Futuro',
-                condizionale: 'Condizionale'
-            };
-            
-            // Generate 4 options including the correct one
+            const tenseNames = { presente: 'Presente', passatoProssimo: 'Passato Prossimo', imperfetto: 'Imperfetto', futuro: 'Futuro', condizionale: 'Condizionale' };
             const options = [tenseNames[randomTense]];
             while (options.length < 4) {
                 const randomOption = tenseTypes[Math.floor(Math.random() * tenseTypes.length)];
@@ -812,7 +834,6 @@
                 if (!options.includes(optionName)) options.push(optionName);
             }
             const shuffledOptions = shuffle(options);
-            
             document.getElementById('gameArea').innerHTML = `
                 <button class="back-btn" onclick="backToModes()">← Back</button>
                 <div class="progress-bar"><div class="progress-fill" style="width: ${((currentIndex + 1) / tensesQuestions.length) * 100}%"></div></div>
@@ -825,9 +846,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 600px; margin: 0 auto;">
                     ${shuffledOptions.map(opt => `<button class="choice-btn" onclick="checkTenseAnswer('${opt}', '${tenseNames[randomTense]}')">${opt}</button>`).join('')}
                 </div>
-                <div style="text-align: center; margin-top: 30px; color: var(--text-secondary);">
-                    ${currentIndex + 1} of ${tensesQuestions.length}
-                </div>
+                <div style="text-align: center; margin-top: 30px; color: var(--text-secondary);">${currentIndex + 1} of ${tensesQuestions.length}</div>
             `;
         }
         function checkTenseAnswer(selected, correct) {
@@ -839,6 +858,126 @@
                 document.getElementById('gameArea').innerHTML += `<div class="feedback error">✗ Correct answer: <strong>${correct}</strong></div>`;
             }
             setTimeout(() => { currentIndex++; showTensesQuestion(); }, 1500);
+        }
+
+        // ─── MEDICAL TERMS MODE ───────────────────────────────────────────────────────
+        let medicalQuestions = [], medicalDirection = 'it-en'; // 'it-en' or 'en-it'
+
+        function initMedicalMode() {
+            // Show direction picker before starting
+            document.getElementById('gameArea').innerHTML = `
+                <button class="back-btn" onclick="backToModes()">← Back</button>
+                <div style="text-align: center; margin: 40px 0;">
+                    <h2 style="font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-secondary); margin-bottom: 10px;">🏥 Learn Medical Terms</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px;">${gameData.medical.length} terms loaded — choose your practice direction</p>
+                    <div class="direction-toggle" style="margin-bottom: 40px;">
+                        <button class="dir-btn active" id="dirItEn" onclick="setMedicalDirection('it-en')">🇮🇹 Italian → 🇬🇧 English</button>
+                        <button class="dir-btn" id="dirEnIt" onclick="setMedicalDirection('en-it')">🇬🇧 English → 🇮🇹 Italian</button>
+                    </div>
+                    <button onclick="startMedicalQuiz()" style="padding: 16px 48px; font-size: 1.1rem; background: var(--accent-secondary);">Start Practice →</button>
+                </div>
+            `;
+        }
+
+        function setMedicalDirection(dir) {
+            medicalDirection = dir;
+            document.getElementById('dirItEn').classList.toggle('active', dir === 'it-en');
+            document.getElementById('dirEnIt').classList.toggle('active', dir === 'en-it');
+        }
+
+        function startMedicalQuiz() {
+            medicalQuestions = shuffle(gameData.medical).slice(0, 15);
+            currentIndex = 0;
+            sessionScore = { correct: 0, total: 0 };
+            showMedicalQuestion();
+        }
+
+        function showMedicalQuestion() {
+            if (currentIndex >= medicalQuestions.length) {
+                const percentage = Math.round((sessionScore.correct / sessionScore.total) * 100);
+                const emoji = percentage >= 80 ? '🏆' : percentage >= 60 ? '🎉' : '📚';
+                const message = percentage >= 80 ? 'Excellent work!' : percentage >= 60 ? 'Good effort!' : 'Keep practicing!';
+                document.getElementById('gameArea').innerHTML = `
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">${emoji}</div>
+                        <h2 style="font-family: 'DM Serif Display', serif; font-size: 2rem; color: ${percentage >= 60 ? 'var(--success)' : 'var(--error)'}; margin-bottom: 10px;">${message}</h2>
+                        <div class="stats" style="border-top: none; margin-top: 20px;">
+                            <div class="stat"><div class="stat-value">${percentage}%</div><div class="stat-label">Score</div></div>
+                            <div class="stat"><div class="stat-value">${sessionScore.correct}/${sessionScore.total}</div><div class="stat-label">Correct</div></div>
+                            <div class="stat"><div class="stat-value">${medicalDirection === 'it-en' ? '🇮🇹→🇬🇧' : '🇬🇧→🇮🇹'}</div><div class="stat-label">Direction</div></div>
+                        </div>
+                        <div class="controls" style="margin-top: 30px; flex-wrap: wrap;">
+                            <button onclick="backToModes()">← Back</button>
+                            <button onclick="startMedicalQuiz()">Same Direction</button>
+                            <button onclick="setMedicalDirection(medicalDirection === 'it-en' ? 'en-it' : 'it-en'); startMedicalQuiz();" style="background: #2A7A6A;">Flip Direction</button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const item = medicalQuestions[currentIndex];
+            const isItEn = medicalDirection === 'it-en';
+            const prompt = isItEn ? item.italian : item.english;
+            const correctAnswer = isItEn ? item.english : item.italian;
+            const dirLabel = isItEn ? 'What is the English for:' : 'How do you say in Italian:';
+
+            // Generate 3 wrong options from the full medical pool
+            const wrongPool = gameData.medical.filter(m => m !== item);
+            const wrongs = shuffle(wrongPool).slice(0, 3).map(m => isItEn ? m.english : m.italian);
+            const options = shuffle([correctAnswer, ...wrongs]);
+
+            const progress = ((currentIndex + 1) / medicalQuestions.length) * 100;
+
+            document.getElementById('gameArea').innerHTML = `
+                <button class="back-btn" onclick="initMedicalMode()">← Back</button>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
+                <div style="text-align: center; margin: 30px 0 35px;">
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 12px;">${dirLabel}</p>
+                    <h2 style="font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--accent-secondary); line-height: 1.3;">${prompt}</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 680px; margin: 0 auto;">
+                    ${options.map(opt => `
+                        <button class="choice-btn" style="text-align: left; padding: 16px 18px; font-size: 0.95rem; line-height: 1.4;"
+                            onclick="checkMedicalAnswer(this, '${opt.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${correctAnswer.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                            ${opt}
+                        </button>`).join('')}
+                </div>
+                <div style="text-align: center; margin-top: 25px; color: var(--text-secondary); font-size: 0.9rem;">
+                    Term ${currentIndex + 1} of ${medicalQuestions.length} &nbsp;·&nbsp; ${sessionScore.correct} correct
+                </div>
+            `;
+        }
+
+        function checkMedicalAnswer(btn, selected, correct) {
+            // Disable all buttons
+            const allBtns = document.querySelectorAll('.choice-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            sessionScore.total++;
+            if (selected === correct) {
+                sessionScore.correct++;
+                btn.style.background = '#E8F5E9';
+                btn.style.borderColor = 'var(--success)';
+                btn.style.color = '#2E7D32';
+                document.getElementById('gameArea').innerHTML += `
+                    <div class="feedback success" style="max-width: 680px; margin: 15px auto 0;">✓ Correct!</div>`;
+            } else {
+                btn.style.background = '#FFEBEE';
+                btn.style.borderColor = 'var(--error)';
+                btn.style.color = '#C62828';
+                // Highlight correct answer
+                allBtns.forEach(b => {
+                    if (b.textContent.trim() === correct) {
+                        b.style.background = '#E8F5E9';
+                        b.style.borderColor = 'var(--success)';
+                        b.style.color = '#2E7D32';
+                    }
+                });
+                document.getElementById('gameArea').innerHTML += `
+                    <div class="feedback error" style="max-width: 680px; margin: 15px auto 0;">✗ Correct answer: <strong>${correct}</strong></div>`;
+            }
+            setTimeout(() => { currentIndex++; showMedicalQuestion(); }, 1800);
         }
     </script>
 </body>
